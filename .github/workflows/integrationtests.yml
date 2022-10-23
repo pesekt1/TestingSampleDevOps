@@ -6,33 +6,43 @@ on:
 jobs:
   Tests:
     runs-on: ubuntu-latest
-    
+
+    # OS environment variables for the Docker container where the workflow will run
+    # these will override the variables in appsettings.json in the source code
+    # double underscore means hierarchy in YML - database is an object with those properties
+    # IntegrationSecurity: false - means we are using remote SQL database, in our case a servcie container
+    # Database.Server "sqlserver" - must match the name of the service container
     env:
       Database__IntegratedSecurity: "false"
       Database__Server: "sqlserver"
       Database__Port: "1433"
       Database__UserId: "SA"
       Database__Password: "P@ssword1$"
-      
+
+    # run the workflow inside a container, provide image from DockerHub
     container:
       image: mcr.microsoft.com/dotnet/sdk:5.0
 
+    # service container with label sqlserver
     services:
-          sqlserver:
-            image: mcr.microsoft.com/mssql/server:2019-latest
-            env:
-              SA_PASSWORD: ${{ env.Database__Password }}
-              ACCEPT_EULA: Y
-            ports:
-              - "1433:1433"
+      sqlserver:
+        image: mcr.microsoft.com/mssql/server:2019-latest
+        # Password for sa account, accept end user licence agreement: yes
+        env:
+          SA_PASSWORD: ${{ env.Database__Password }}
+          ACCEPT_EULA: Y
+        # mapping internal SQL Server port to an external port
+        # that will be used by .NET code running inside the container
+        ports:
+          - "1433:1433"
 
     steps:
       - uses: actions/checkout@v2
-                  
+
       - name: Restore dependencies
         run: |
           dotnet restore
           dotnet build --configuration 'release'
-          
+
       - name: Run Unit and Integration Tests
         run: dotnet test --logger "console;verbosity=detailed"
