@@ -28,8 +28,9 @@ jobs:
       sqlserver:
         image: mcr.microsoft.com/mssql/server:2019-latest
         # Password for sa account, accept end user licence agreement: yes
+        # https://hub.docker.com/_/microsoft-mssql-server
         env:
-          SA_PASSWORD: ${{ env.Database__Password }}
+          SA_PASSWORD: ${{ env.Database__Password }} #double underscore means the hierarchy of the object: Database.Password
           ACCEPT_EULA: Y
         # mapping internal SQL Server port to an external port
         # that will be used by .NET code running inside the container
