@@ -37,3 +37,14 @@ There is a file initializing the database: Data/DbInitializer.cs
     }
 ```
 
+There is a testing project in the solution: TestingSampleDevOps.Tests containing:
+- Unit tests
+- Integration tests
+
+Workflows with testing are defined in .github/workflows folder
+- unittests.yml
+- integrationtests.yml
+- sonarcloud.yml
+
+SonarCloud is used for static code analysis.
+
